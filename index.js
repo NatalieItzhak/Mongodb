@@ -9,6 +9,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 app.use('/api/products', productsRouter)
+app.get('/:id', productsRouter)
 
 //connect to db with mongoose
 mongoose.connect('mongodb://localhost/productsModel', {
