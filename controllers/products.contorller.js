@@ -19,15 +19,6 @@ const createProduct = async (req, res) => {
       }
     }
 
-    const getProducts = async (req, res) => {
-        try {
-          const products = await productModel.find({});
-          return res.send(products);
-        } catch (error) {
-          return res.status(500).json({ "error": error })
-        }
-      }
-      
       const getProductbyName = async (req, res) => {
         try {
           const { name } = req.params;
@@ -39,42 +30,47 @@ const createProduct = async (req, res) => {
         } catch (error) {
           return res.status(500).json({ "error": error })
         }
-      }
       
-      const getActiveProducts = async (req, res) => {
-        try {
-          const query = req.query;
-          if (query.hasOwnProperty("isActive")) {
-            const products = await productModel.find({ isActive: query.isActive });
-            return res.send(products);
-          }
-          else {
-            return res.status(400).send();
-          }
-        } catch (error) {
-          return res.status(500).json({ "error": error })
-        }
+    }
+     
+const getProduct = async (req, res) => {
+    const { id } = req.params;
+    try {
+      const product = await productModel.findById(id);
+      if (!product) {
+        return res.status(404).send("Wrong ID");
       }
-      
-      const getByPriceRange = async (req, res) => {
-        try {
-          const query = req.query;
-          if (query.hasOwnProperty("min") && query.hasOwnProperty("max")) {
-            const products = await productModel.find({ "details.price": { $gt: query.min, $lt: query.max } });
-            return res.send(products);
-          }
-          else {
-            return res.status(400).send();
-          }
-        } catch (error) {
-          return res.status(500).json({ "error": error })
-        }
-      }
+      res.json(product);
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  };
+  
+  const getActiveProducts = async (req, res) => {
+    try {
+      const products = await productModel.find({ isActive: true });
+      res.send(products);
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  };
+  
+  const getProductsByPriceRange = async (req, res) => {
+    const { min, max } = req.body;
+    try {
+      const products = await productModel.find({
+        "details.price": { $gte: min, $lte: max },
+      });
+      res.send(products);
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  };
 module.exports = {
     create: createProduct,
     getAll: getProduct,
     getProductbyName,
-    activeProducts,
-    getByPriceRange
+    getActiveProducts,
+    getProductsByPriceRange
 
 }
