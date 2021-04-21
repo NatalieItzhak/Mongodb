@@ -57,6 +57,7 @@ const getProduct = async (req, res) => {
   
   const getProductsByPriceRange = async (req, res) => {
     const { min, max } = req.body;
+    console.log(req.body)
     try {
       const products = await productModel.find({
         "details.price": { $gte: min, $lte: max },
